@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Load64bitDll", "Load64bitDll\Load64bitDll.vcxproj", "{E121457C-2D74-4258-B560-94F6501E6D3E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6479A345-85D2-4EC5-A342-B1F70A9D6DC5} = {6479A345-85D2-4EC5-A342-B1F70A9D6DC5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wow64hlp", "wow64hlp\wow64hlp.vcxproj", "{6479A345-85D2-4EC5-A342-B1F70A9D6DC5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Load64bitTest", "Load64bitTest\Load64bitTest.vcxproj", "{C7E47F58-A735-4DBD-A314-8817806144D4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E121457C-2D74-4258-B560-94F6501E6D3E} = {E121457C-2D74-4258-B560-94F6501E6D3E}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E121457C-2D74-4258-B560-94F6501E6D3E}.Debug|x86.ActiveCfg = Debug|Win32
+		{E121457C-2D74-4258-B560-94F6501E6D3E}.Debug|x86.Build.0 = Debug|Win32
+		{E121457C-2D74-4258-B560-94F6501E6D3E}.Release|x86.ActiveCfg = Release|Win32
+		{E121457C-2D74-4258-B560-94F6501E6D3E}.Release|x86.Build.0 = Release|Win32
+		{6479A345-85D2-4EC5-A342-B1F70A9D6DC5}.Debug|x86.ActiveCfg = Debug|x64
+		{6479A345-85D2-4EC5-A342-B1F70A9D6DC5}.Debug|x86.Build.0 = Debug|x64
+		{6479A345-85D2-4EC5-A342-B1F70A9D6DC5}.Release|x86.ActiveCfg = Release|x64
+		{6479A345-85D2-4EC5-A342-B1F70A9D6DC5}.Release|x86.Build.0 = Release|x64
+		{C7E47F58-A735-4DBD-A314-8817806144D4}.Debug|x86.ActiveCfg = Debug|Win32
+		{C7E47F58-A735-4DBD-A314-8817806144D4}.Debug|x86.Build.0 = Debug|Win32
+		{C7E47F58-A735-4DBD-A314-8817806144D4}.Release|x86.ActiveCfg = Release|Win32
+		{C7E47F58-A735-4DBD-A314-8817806144D4}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3E1855C0-E0CE-4EE1-B991-62DD6AF85D3A}
+	EndGlobalSection
+EndGlobal
