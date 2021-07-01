@@ -144,6 +144,11 @@
   <ItemGroup>
     <ClCompile Include="gdicookie.cpp" />
     <ClCompile Include="ldrinit.cpp" />
+    <ClCompile Include="minhook\minkernel32\minkernel32.c" />
+    <ClCompile Include="minhook\src\buffer.c" />
+    <ClCompile Include="minhook\src\hde\hde64.c" />
+    <ClCompile Include="minhook\src\hook.c" />
+    <ClCompile Include="minhook\src\trampoline.c" />
     <ClCompile Include="wow64hlp.cpp" />
   </ItemGroup>
   <ItemGroup>
