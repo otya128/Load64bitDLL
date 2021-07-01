@@ -171,6 +171,88 @@ void init_threads(void)
     RtlFreeHeap(RtlGetProcessHeap(), 0, sys_info);
 }
 
+#include "minhook/include/MinHook.h"
+PVOID(NTAPI*OrigRtlAllocateHeap)(
+    PVOID  HeapHandle,
+    ULONG  Flags,
+    SIZE_T Size
+    );
+PVOID NTAPI HookRtlAllocateHeap(
+    PVOID  HeapHandle,
+    ULONG  Flags,
+    SIZE_T Size
+)
+{
+    if (HeapHandle == nullptr)
+    {
+        DPRINTF("HookRtlAllocateHeap: HeapHandle == nullptr! (LdrpTlsHeap == nullptr?)\n");
+        return OrigRtlAllocateHeap(RtlGetProcessHeap(), Flags, Size);
+    }
+    return OrigRtlAllocateHeap(HeapHandle, Flags, Size);
+}
+BOOLEAN(NTAPI*OrigRtlFreeHeap)(
+    PVOID HeapHandle,
+    ULONG Flags,
+    PVOID HeapBase
+    );
+BOOLEAN NTAPI HookRtlFreeHeap(
+    PVOID HeapHandle,
+    ULONG Flags,
+    PVOID HeapBase
+)
+{
+    if (HeapHandle == nullptr)
+    {
+        DPRINTF("HookRtlFreeHeap: HeapHandle == nullptr! (LdrpTlsHeap == nullptr?)\n");
+        return OrigRtlFreeHeap(RtlGetProcessHeap(), Flags, HeapBase);
+    }
+    return OrigRtlFreeHeap(HeapHandle, Flags, HeapBase);
+}
+
+// ntdll!LdrpHandleTlsData may be called by loading ole32.dll. (Windows 11?)
+// Load DLL -> ntdll!LdrpHandleTlsData -> ... -> RtlAllocateHeap(LdrpTlsHeap = nullptr, ...) -> STATUS_ACCESS_VIOLATION
+VOID InstallHeapHack(VOID)
+{
+    ANSI_STRING proc_name;
+    RtlInitAnsiString(&proc_name, "RtlAllocateHeap");
+    LPVOID RtlAllocateHeap;
+    if (!NT_SUCCESS(LdrGetProcedureAddress(ntdll, &proc_name, 0, (void**)&RtlAllocateHeap)))
+    {
+        return;
+    }
+    RtlInitAnsiString(&proc_name, "RtlFreeHeap");
+    LPVOID RtlFreeHeap;
+    if (!NT_SUCCESS(LdrGetProcedureAddress(ntdll, &proc_name, 0, (void**)&RtlFreeHeap)))
+    {
+        return;
+    }
+    if (MH_Initialize() != MH_OK)
+    {
+        return;
+    }
+    if (MH_CreateHook(RtlAllocateHeap, HookRtlAllocateHeap, (LPVOID*)&OrigRtlAllocateHeap) != MH_OK)
+    {
+        return;
+    }
+    if (MH_CreateHook(RtlFreeHeap, HookRtlFreeHeap, (LPVOID*)&OrigRtlFreeHeap) != MH_OK)
+    {
+        return;
+    }
+    if (MH_QueueEnableHook(RtlAllocateHeap) != MH_OK)
+    {
+        return;
+    }
+    if (MH_QueueEnableHook(RtlFreeHeap) != MH_OK)
+    {
+        return;
+    }
+    if (MH_ApplyQueued() != MH_OK)
+    {
+        return;
+    }
+    return;
+}
+
 __declspec(dllexport) BOOL Wow64Helper(void)
 {
     UNICODE_STRING uni;
@@ -192,6 +274,7 @@ __declspec(dllexport) BOOL Wow64Helper(void)
     }
     init_threads();
     old_NtDeviceIoControlFile = (decltype(NtDeviceIoControlFile)*)hook_syscall("NtDeviceIoControlFile", (PVOID)hook_NtDeviceIoControlFile);
+    InstallHeapHack();
     InstallGdiHack();
     return true;
 }
