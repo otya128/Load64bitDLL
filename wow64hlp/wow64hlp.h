@@ -230,6 +230,7 @@ NTSYSAPI ULONG NTAPI vDbgPrintEx(
 PVOID NTAPI RtlZeroMemory(PVOID, SIZE_T);
 VOID NTAPI RtlActivateActivationContextUnsafeFast(PVOID, PVOID);
 VOID NTAPI RtlDeactivateActivationContextUnsafeFast(PVOID);
+PVOID NTAPI RtlAddVectoredExceptionHandler(ULONG First, PVECTORED_EXCEPTION_HANDLER Handler);
 
 typedef struct _SYSTEM_EXTENDED_THREAD_INFORMATION
 {
@@ -258,4 +259,6 @@ void dprintf(const char *fmt, ...);
 #define _SEH2_TRY __try
 #define _SEH2_EXCEPT __except
 #define _SEH2_END
+LONG NTAPI GdiHackExceptHandler(EXCEPTION_POINTERS *ExceptionInfo);
+VOID InstallGdiHack(VOID);
 EXTERN_C_END

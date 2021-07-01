@@ -192,6 +192,7 @@ __declspec(dllexport) BOOL Wow64Helper(void)
     }
     init_threads();
     old_NtDeviceIoControlFile = (decltype(NtDeviceIoControlFile)*)hook_syscall("NtDeviceIoControlFile", (PVOID)hook_NtDeviceIoControlFile);
+    InstallGdiHack();
     return true;
 }
 
