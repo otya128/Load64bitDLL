@@ -84,7 +84,7 @@ static void *hook_syscall(PCSTR func_name, PVOID hook_func)
         return nullptr;
     }
     *(syscall_entry*)((SIZE_T)address + ((SIZE_T)sys & 0xfff)) = *sys;
-    result = (decltype(NtDeviceIoControlFile)*)((SIZE_T)address + ((SIZE_T)sys & 0xfff));
+    result = (PVOID)((SIZE_T)address + ((SIZE_T)sys & 0xfff));
     PVOID hook_addr = sys;
     ULONG old = 0;
     if (!NT_SUCCESS(NtProtectVirtualMemory(NtCurrentProcess(), &hook_addr, &size, PAGE_EXECUTE_READWRITE, &old)))
@@ -94,8 +94,8 @@ static void *hook_syscall(PCSTR func_name, PVOID hook_func)
     syscall_entry_hooked *hooked = (syscall_entry_hooked*)sys;
     hooked->movabs_rax = 0xb848;
     hooked->jmp_rax = 0xe0ff;
-    hooked->addr = hook_NtDeviceIoControlFile;
-    NtProtectVirtualMemory(reinterpret_cast<HANDLE>(-1), &hook_addr, &size, old, &old);
+    hooked->addr = (LPVOID)hook_func;
+    NtProtectVirtualMemory(NtCurrentProcess(), &hook_addr, &size, old, &old);
     return result;
 }
 

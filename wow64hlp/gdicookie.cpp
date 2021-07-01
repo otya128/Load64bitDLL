@@ -2,7 +2,7 @@
 EXTERN_C_START
 /*
  GDI Cookie Hack
-Windows 11
+Windows build 21354
 32.9: kd:x86> dt win32k!_W32PROCESS 0xffffd70f`41d6dac0
    +0x000 Process          : 0xffff808c`5dbd0080 _EPROCESS
    +0x008 RefCount         : 1
@@ -36,7 +36,7 @@ Windows 11
    +0x120 bWroteScreenBits : 0y0
 --Windows 10 21H1
    +0x124 Cookie           : 0x1d1300c <= new!!!!!!
---Windows 21H2
+--Windows build 21354
 */
 
 #include <pshpack1.h>
