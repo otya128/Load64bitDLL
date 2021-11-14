@@ -229,7 +229,7 @@ extern "C" __declspec(dllexport) UINT64 __cdecl GetProcAddress64(UINT64 hmod, LP
 static UINT64 pDllMain;
 static UINT64 helper;
 
-void load()
+bool load()
 {
     handle = OpenProcess(PROCESS_VM_READ, FALSE, GetCurrentProcessId());
     auto ntdll = GetModuleHandleW(L"ntdll.dll");
@@ -239,14 +239,27 @@ void load()
     pLdrGetProcedureAddress = get_proc_address(ntdll64, "LdrGetProcedureAddress");
     pLdrLoadDll = get_proc_address(ntdll64, "LdrLoadDll");
     pLdrUnloadDll = get_proc_address(ntdll64, "LdrUnloadDll");
-    helper = LoadLibraryW64(L"wow64hlp.dll");
+    WCHAR search_buf[MAX_PATH];
+    WCHAR dll[MAX_PATH];
+    search_buf[0] = 0;
+    if (GetDllDirectoryW(ARRAYSIZE(search_buf), search_buf) && search_buf[0])
+    {
+        dll[0] = 0;
+        if (SearchPathW(search_buf, L"wow64hlp.dll", nullptr, ARRAYSIZE(dll), dll, nullptr) && dll[0])
+        {
+            helper = LoadLibraryW64(dll);
+        }
+    }
+    if (!helper)
+        helper = LoadLibraryW64(L"wow64hlp.dll");
     auto help_func = GetProcAddress64(helper, "Wow64Helper");
     if (!help_func)
     {
-        return;
+        return false;
     }
     auto result = Call64<UINT64>(help_func);
     pDllMain = GetProcAddress64(helper, "DllMain");
+    return true;
 }
 
 void unload()
@@ -259,8 +272,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        load();
-        break;
+        return load();
     case DLL_THREAD_ATTACH:
         if (pDllMain)
         {
